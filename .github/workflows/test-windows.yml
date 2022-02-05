@@ -1,7 +1,11 @@
 # derived from Fiona: https://github.com/Toblerity/Fiona
 name: Windows Test
 
-on: [push]
+on:
+  push:
+    branches: [ main, 0.** ]
+  pull_request:
+      branches: [ main, 0.** ]
 
 jobs:
   test:
