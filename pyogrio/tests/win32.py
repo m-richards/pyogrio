@@ -62,7 +62,7 @@ if platform.system() == "Windows":
     except Exception as ex:
         print(ex)
 
-    try:
+    try:  # ERROR 1: "invalid" not recognised as an available field.
         test_read_where_invalid(naturalearth_lowres)
     except Exception as ex:
         print(ex)
@@ -73,6 +73,12 @@ if platform.system() == "Windows":
         except Exception as ex:
             print(ex)
 
+
+    # Warning 1: A geometry of type MULTIPOLYGON is inserted into layer test of geometry type POLYGON,
+    # which is not normally allowed by the GeoPackage specification, but the driver will however do it.
+    # To create a conformant GeoPackage, if using ogr2ogr, the -nlt option can be used to override the
+    # layer geometry type. This warning will no longer be emitted for this combination of
+    # layer and feature geometry type.
     with TemporaryDirectory() as tmpdir:
         try:
             test_write_gpkg(tmpdir, naturalearth_lowres)
