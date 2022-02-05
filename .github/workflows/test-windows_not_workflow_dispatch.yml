@@ -142,11 +142,11 @@ jobs:
           python -m pytest -sv pyogrio/tests
 
       - name: pytest2
-          continue-on-error: ${{ matrix.allow_failure == 'true' }}
-          run: |
-            pytest -sv pyogrio/tests
+        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        run: |
+          pytest -sv pyogrio/tests
 
       - name: pytest3
-          continue-on-error: ${{ matrix.allow_failure == 'true' }}
-          run: |
-            pytest --pyargs pyogrio
+        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        run: |
+          pytest --pyargs pyogrio
