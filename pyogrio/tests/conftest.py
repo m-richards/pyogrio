@@ -1,7 +1,8 @@
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 import sys
-print(f"sys path is: {sys.path}")
+import os
+print(f"sys path is: {sys.path}\n", os.getcwd())
 
 import pytest
 
