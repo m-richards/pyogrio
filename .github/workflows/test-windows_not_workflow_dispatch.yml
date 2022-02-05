@@ -140,6 +140,7 @@ jobs:
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
+          echo "$env:PATH"
           python -m pytest -sv pyogrio/tests --import-mode=append
 
       - name: pytest2
