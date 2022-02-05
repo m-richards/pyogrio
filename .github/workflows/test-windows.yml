@@ -1,7 +1,7 @@
 # derived from Fiona: https://github.com/Toblerity/Fiona
 name: Windows Test
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   test:
@@ -145,3 +145,8 @@ jobs:
           continue-on-error: ${{ matrix.allow_failure == 'true' }}
           run: |
             pytest -sv pyogrio/tests
+
+      - name: pytest3
+          continue-on-error: ${{ matrix.allow_failure == 'true' }}
+          run: |
+            pytest --pyargs pyogrio
