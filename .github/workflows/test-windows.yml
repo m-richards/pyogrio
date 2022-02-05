@@ -140,3 +140,8 @@ jobs:
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
           python -m pytest -sv pyogrio/tests
+
+      - name: pytest2
+          continue-on-error: ${{ matrix.allow_failure == 'true' }}
+          run: |
+            pytest -sv pyogrio/tests
