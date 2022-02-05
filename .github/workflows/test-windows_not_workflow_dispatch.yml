@@ -137,16 +137,16 @@ jobs:
           python pyogrio/tests/win32.py
 
       - name: pytest
-        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        continue-on-error: true
         run: |
           python -m pytest -sv pyogrio/tests
 
       - name: pytest2
-        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        continue-on-error: true
         run: |
           pytest -sv pyogrio/tests
 
       - name: pytest3
-        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        continue-on-error: true
         run: |
           pytest --pyargs pyogrio
