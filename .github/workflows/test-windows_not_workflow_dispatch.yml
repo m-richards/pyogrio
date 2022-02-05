@@ -140,16 +140,16 @@ jobs:
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
-          python -m pytest -sv pyogrio/tests
+          python -m pytest -sv pyogrio/tests --import-mode=append
 
       - name: pytest2
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
-          pytest -sv pyogrio/tests
+          python -m pytest -sv pyogrio/tests --import-mode=append
 
       - name: pytest3
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
-          pytest --pyargs pyogrio
+          python -m pytest -sv pyogrio/tests --import-mode=importlib
