@@ -141,10 +141,10 @@ jobs:
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
           echo "$env:PATH"
-          python -m pytest -sv . --import-mode=importlib
+          python -m pytest -sv ./pyogrio --import-mode=importlib
 
       - name: pytesta
-        working-directory: ../
+        working-directory: ./
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
