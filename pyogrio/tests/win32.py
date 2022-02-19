@@ -6,6 +6,7 @@ import platform
 from tempfile import TemporaryDirectory
 import os
 print(f"win32 sys path: {sys.path}\n", os.getcwd())
+print("environment vars\n", os.environ)
 
 data_dir = Path(__file__).parent.resolve() / "fixtures"
 
