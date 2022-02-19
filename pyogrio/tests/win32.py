@@ -7,6 +7,7 @@ from tempfile import TemporaryDirectory
 import os
 print(f"win32 sys path: {sys.path}\n", os.getcwd())
 print("environment vars\n", os.environ)
+sys.path.insert(0, "D:\\a\\pyogrio\\pyogrio\\pyogrio\\tests")
 
 data_dir = Path(__file__).parent.resolve() / "fixtures"
 
