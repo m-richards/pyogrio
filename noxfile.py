@@ -40,7 +40,7 @@ def tests(session: Session):
         "setup.py",
         "build_ext",
         # f'--install-option="-I{GDAL_INCLUDE_PATH}"',
-        '-IC:\OSGeo4W\include',
+        f'-I{GDAL_INCLUDE_PATH}',
         '-lgdal_i',
         f'-L{GDAL_LIB_PATH}',
         '-v',
