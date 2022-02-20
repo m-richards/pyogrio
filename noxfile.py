@@ -17,7 +17,7 @@ from nox import Session
 def tests(session: Session):
     session.install("wheel", "cython~=0.29", "numpy~=1.19", "pandas", "pytest", "pytest-cov", "setuptools")
 
-    session.run("gdalinfo.exe", "--version", external=True)
+    # session.run("gdalinfo.exe", "--version", external=True)
 
     # session.run(
     #     "pip",

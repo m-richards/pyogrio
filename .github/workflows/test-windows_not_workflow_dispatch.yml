@@ -143,26 +143,27 @@ jobs:
           echo "$env:PATH"
           pytest -sv ./pyogrio --import-mode=importlib
 
-      - name: pytesta
-        working-directory: ./
-        if: always()
-        continue-on-error: ${{ matrix.allow_failure == 'true' }}
-        run: |
-          echo "$env:PATH"
-          python -m pytest -sv . --import-mode=append
-
-      - name: pytest collect
-        working-directory: ./
-        if: always()
-        continue-on-error: ${{ matrix.allow_failure == 'true' }}
-        run: |
-          echo "$env:PATH"
-          echo "pytest invocation"
-          pytest -sv --collect-only .
+#      - name: pytesta
+#        working-directory: ./
+#        if: always()
+#        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+#        run: |
+#          echo "$env:PATH"
+#          python -m pytest -sv . --import-mode=append
+#
+#      - name: pytest collect
+#        working-directory: ./
+#        if: always()
+#        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+#        run: |
+#          echo "$env:PATH"
+#          echo "pytest invocation"
+#          pytest -sv --collect-only .
 
       - name: nox_attempt
         if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
+          echo "$env:PATH"
           python -m pip install nox
           nox -s tests
