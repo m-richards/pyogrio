@@ -5,8 +5,10 @@ import nox
 #     "numpy",
 #     "geopandas"
 # ]
-GDAL_INCLUDE_PATH = r"C:\OSGeo4W\include"
-GDAL_LIB_PATH = r"C:\OSGeo4W\lib"
+# GDAL_INCLUDE_PATH = r"C:\OSGeo4W\include"
+GDAL_INCLUDE_PATH = r"C:\gdal\include"
+# GDAL_LIB_PATH = r"C:\OSGeo4W\lib"
+GDAL_LIB_PATH = r"C:\gdal\lib"
 
 from nox import Session
 
