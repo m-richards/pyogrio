@@ -1,5 +1,13 @@
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
+import sys
+import os
+print(f"sys path is: {sys.path}\n", os.getcwd())
+'D:\\a\\pyogrio\\pyogrio\\pyogrio\\tests'
+os.environ['PATH'] = '{};{}'.format('D:\\a\\pyogrio\\pyogrio\\pyogrio\\tests', os.environ['PATH'])
+
+print(f"conftest sys path: {sys.path}\n", os.getcwd())
+print("environment vars\n", os.environ)
 
 import pytest
 

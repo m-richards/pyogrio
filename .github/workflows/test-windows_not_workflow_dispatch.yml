@@ -1,7 +1,7 @@
 # derived from Fiona: https://github.com/Toblerity/Fiona
 name: Windows Test
 
-on: workflow_dispatch
+on: push
 
 jobs:
   test:
@@ -85,7 +85,7 @@ jobs:
           echo "Install pandas"
           python -m pip install pandas
           echo "Install test dependencies"
-          python -m pip install pytest~=5.0 pytest-cov
+          python -m pip install pytest pytest-cov
 
       - name: Build pyogrio
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
@@ -110,19 +110,19 @@ jobs:
         run: |
           echo ""
           echo "Dependencies for gdal"
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64\dumpbin.exe" /DEPENDENTS c:\gdal\bin\gdal302.dll
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\dumpbin.exe" /DEPENDENTS c:\gdal\bin\gdal302.dll
           echo ""
           echo "Imports from gdal"
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64\dumpbin.exe" /IMPORTS c:\gdal\bin\gdal302.dll
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\dumpbin.exe" /IMPORTS c:\gdal\bin\gdal302.dll
           echo ""
           echo "Exports from gdal"
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64\dumpbin.exe" /EXPORTS c:\gdal\bin\gdal302.dll
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\dumpbin.exe" /EXPORTS c:\gdal\bin\gdal302.dll
           echo ""
           echo "Dependencies of PYD files"
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64\dumpbin.exe" /DEPENDENTS D:\a\pyogrio\pyogrio\pyogrio\_io.cp39-win_amd64.pyd
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\dumpbin.exe" /DEPENDENTS D:\a\pyogrio\pyogrio\pyogrio\_io.cp39-win_amd64.pyd
           echo ""
           echo "Imports from PYD files"
-          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.28.29333\bin\HostX86\x64\dumpbin.exe" /IMPORTS D:\a\pyogrio\pyogrio\pyogrio\_io.cp39-win_amd64.pyd
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\bin\HostX86\x64\dumpbin.exe" /IMPORTS D:\a\pyogrio\pyogrio\pyogrio\_io.cp39-win_amd64.pyd
 
       - name: Check module status
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
@@ -137,6 +137,33 @@ jobs:
           python pyogrio/tests/win32.py
 
       - name: pytest
+        if: always()
         continue-on-error: ${{ matrix.allow_failure == 'true' }}
         run: |
-          python -m pytest -sv pyogrio/tests
+          echo "$env:PATH"
+          pytest -sv ./pyogrio --import-mode=importlib
+
+#      - name: pytesta
+#        working-directory: ./
+#        if: always()
+#        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+#        run: |
+#          echo "$env:PATH"
+#          python -m pytest -sv . --import-mode=append
+#
+#      - name: pytest collect
+#        working-directory: ./
+#        if: always()
+#        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+#        run: |
+#          echo "$env:PATH"
+#          echo "pytest invocation"
+#          pytest -sv --collect-only .
+
+      - name: nox_attempt
+        if: always()
+        continue-on-error: ${{ matrix.allow_failure == 'true' }}
+        run: |
+          echo "$env:PATH"
+          python -m pip install nox
+          nox -s tests

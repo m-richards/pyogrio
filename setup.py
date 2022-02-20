@@ -42,7 +42,7 @@ ext_options = {
 }
 ext_modules = []
 
-
+print("arv", sys.argv)
 # setuptools clean does not cleanup Cython artifacts
 if "clean" in sys.argv:
     if os.path.exists("build"):
@@ -89,12 +89,14 @@ else:
                 try:
                     gdalinfo_path = None
                     for path in os.getenv("PATH", "").split(os.pathsep):
-                        matches = list(Path(path).glob("**/gdalinfo*"))
+                        matches = list(Path(path).glob("**/gdalinfo"))
+                        matches += list(Path(path).glob("**/gdalinfo.exe"))
                         if matches:
                             gdalinfo_path = matches[0]
                             break
 
                     if gdalinfo_path:
+                        print("got gdal path", gdalinfo_path)
                         raw_version = read_response([gdalinfo_path, "--version"]) or ""
                         m = re.search("\d+\.\d+\.\d+", raw_version)
                         if m:
@@ -120,7 +122,8 @@ else:
 
     if not GDAL_VERSION > MIN_GDAL_VERSION:
         sys.exit("GDAL must be >= 2.4.x")
-
+    print("hit the cythonize section")
+    print(ext_options)
     ext_modules = cythonize(
         [
             Extension("pyogrio._err", ["pyogrio/_err.pyx"], **ext_options),
@@ -130,6 +133,7 @@ else:
         ],
         compiler_directives={"language_level": "3"},
     )
+    print("post cythonize")
 
     # Get numpy include directory without importing numpy at top level here
     # from: https://stackoverflow.com/a/42163080
@@ -149,7 +153,7 @@ else:
 version = versioneer.get_version()
 cmdclass = versioneer.get_cmdclass()
 cmdclass["build_ext"] = build_ext
-
+print("running setup")
 setup(
     name="pyogrio",
     version=version,

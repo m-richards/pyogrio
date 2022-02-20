@@ -69,3 +69,5 @@ Geopandas communities.
 
 -   Core I/O methods and supporting functions adapted from [Fiona](https://github.com/Toblerity/Fiona)
 -   Inspired by [Fiona PR](https://github.com/Toblerity/Fiona/pull/540/files)
+
+.trigger_ci
