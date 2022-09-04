@@ -1,5 +1,8 @@
+import datetime
 import json
 import os
+from pathlib import Path
+import pytz
 import sys
 
 import numpy as np
@@ -451,8 +454,38 @@ def test_read_write_datetime(tmp_path):
         [bytes.fromhex("010100000000000000000000000000000000000000")] * 2, dtype=object
     )
     meta = dict(geometry_type="Point", crs="EPSG:4326", spatial_index=False)
-
+    tmp_path = Path("~/.pyogrio").expanduser()
     filename = tmp_path / "test.gpkg"
+    write(filename, geometry, field_data, fields, **meta)
+    result = read(filename)[3]
+    for idx, field in enumerate(fields):
+        if field == "datetime64_precise_ns":
+            # gdal rounds datetimes to ms
+            assert np.array_equal(result[idx], field_data[idx].astype("datetime64[ms]"))
+        else:
+            assert np.array_equal(result[idx], field_data[idx])
+
+
+def test_read_write_datetime_timezone(tmp_path):
+    import pandas as pd
+    # TEST_DATE = datetime.datetime(2021, 11, 21, 1, 7, 43, 17500)
+    # eastern = pytz.timezone("US/Eastern")
+    # test_case = eastern.localize(TEST_DATE)
+    str_test_case = '2021-11-21 01:07:43.0175-05:00'
+    # numpy doesn't support timezones, so how does fiona/ geopandas work?
+    field_data = [
+        # np.array([str_test_case, str_test_case], dtype="datetime64[ms]")
+        pd.to_datetime([str_test_case, str_test_case])
+    ]
+    print(field_data)
+    fields = ["datetime64_ms", ]
+
+    geometry = np.array(
+        [bytes.fromhex("010100000000000000000000000000000000000000")] * 2, dtype=object
+    )
+    meta = dict(geometry_type="Point", crs="EPSG:4326", spatial_index=False)
+    tmp_path = Path("~/.pyogrio").expanduser()
+    filename = tmp_path / "test2.gpkg"
     write(filename, geometry, field_data, fields, **meta)
     result = read(filename)[3]
     for idx, field in enumerate(fields):

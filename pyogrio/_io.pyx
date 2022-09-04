@@ -1285,7 +1285,9 @@ def ogr_write(str path, str layer, str driver, geometry, field_data, fields,
             options = NULL
 
     ### Create the fields
-    field_types = infer_field_types([field.dtype for field in field_data])
+    field_types = infer_field_types([field[0].dtype if isinstance(field, tuple) else field.dtype for field in field_data])
+    print("field data inside ogr_io")
+    print(field_data)
     for i in range(num_fields):
         field_type, field_subtype, width, precision = field_types[i]
 
@@ -1372,7 +1374,12 @@ def ogr_write(str path, str layer, str driver, geometry, field_data, fields,
 
             # Set field values
             for field_idx in range(num_fields):
-                field_value = field_data[field_idx][i]
+                if field_type !=OFTDateTime:
+                    field_value = field_data[field_idx][i]
+                else:
+                    field_value = field_data[field_idx][0][i]
+                    tz_offset_minutes = field_data[field_idx][1]
+
                 field_type = field_types[field_idx][0]
 
                 if field_type == OFTString:
@@ -1421,8 +1428,11 @@ def ogr_write(str path, str layer, str driver, geometry, field_data, fields,
                     )
 
                 elif field_type == OFTDateTime:
-                    # TODO: add support for timezones
                     datetime = field_value.astype("datetime64[ms]").item()
+                    # nTZFlag	(0=unknown, 1=localtime, 100=GMT, see data model for details)
+                    # https://github.com/OSGeo/gdal/issues/2696
+                    # From fiona, # tzinfo: (0=unknown, 100=GMT, 101=GMT+15minute, 99=GMT-15minute), or NULL
+
                     OGR_F_SetFieldDateTimeEx(
                         ogr_feature,
                         field_idx,
@@ -1432,7 +1442,7 @@ def ogr_write(str path, str layer, str driver, geometry, field_data, fields,
                         datetime.hour,
                         datetime.minute,
                         datetime.second + datetime.microsecond / 10**6,
-                        0
+                        int(tz_offset_minutes / 15.0 + 100)
                     )
 
                 else:

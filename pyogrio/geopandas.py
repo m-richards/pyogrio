@@ -1,5 +1,6 @@
 from pyogrio.raw import DRIVERS_NO_MIXED_SINGLE_MULTI
 from pyogrio.raw import detect_driver, read, write
+import numpy as np
 
 
 def _stringify_path(path):
@@ -225,6 +226,7 @@ def write_dataframe(
         import geopandas as gp
         from geopandas.array import to_wkb
         import pandas as pd
+        import pytz
 
         # if geopandas is available so is pyproj
         from pyproj.enums import WktVersion
@@ -255,7 +257,19 @@ def write_dataframe(
     fields = [c for c in df.columns if not c == geometry_column]
 
     # TODO: may need to fill in pd.NA, etc
-    field_data = [df[f].values for f in fields]
+    # field_data = [df[f].values for f in fields]
+    field_data = []
+    for f in fields:
+        srs = df[f]
+        data = srs.values  # For datetimes this already converts to utc, check that's what we want
+        if pd.api.types.is_datetime64tz_dtype(srs):
+            # tz_info = np.zeros(len(data))
+            # tz_info[:] = srs.dtype.tz.utcoffset(pytz.utc).total_seconds() / 60
+            tz_info = srs.dtype.tz.utcoffset(pytz.utc).total_seconds() / 60
+            data = (data, tz_info)
+            print("tz tuple", data)
+
+        field_data.append(data)
 
     # Determine geometry_type and/or promote_to_multi
     if geometry_type is None or promote_to_multi is None:
