@@ -511,6 +511,7 @@ cdef process_fields(
     int n_fields,
     object field_data,
     object field_data_view,
+    object field_metadata,
     object field_indexes,
     object field_ogr_types,
     encoding
@@ -578,7 +579,7 @@ cdef process_fields(
             second = int(ss)
             # fsecond has millisecond accuracy
             microsecond = round(ms * 1000) * 1000
-
+            
             if not success:
                 data[i] = np.datetime64('NaT')
 
@@ -586,6 +587,10 @@ cdef process_fields(
                 data[i] = datetime.date(year, month, day).isoformat()
 
             elif field_type == OFTDateTime:
+                # tzinfo = None
+                if timezone > 1:
+                    tz_minutes = (timezone - 100) * 15
+                    field_metadata[field_index] = tz_minutes
                 data[i] = datetime.datetime(year, month, day, hour, minute, second, microsecond).isoformat()
 
 
@@ -644,6 +649,10 @@ cdef get_features(
         np.empty(shape=(count, ),
         dtype=fields[field_index,3]) for field_index in range(n_fields)
     ]
+    field_metadata = {
+        idx: np.empty(shape=(n_fields,), dtype='int32') 
+        for idx, ftype in zip(field_indexes, field_ogr_types) if ftype==OFTDateTime
+    }
 
     field_data_view = [field_data[field_index][:] for field_index in range(n_fields)]
 
@@ -664,11 +673,11 @@ cdef get_features(
             process_geometry(ogr_feature, i, geom_view, force_2d)
 
         process_fields(
-            ogr_feature, i, n_fields, field_data, field_data_view,
+            ogr_feature, i, n_fields, field_data, field_data_view, field_metadata,
             field_indexes, field_ogr_types, encoding
         )
 
-    return fid_data, geometries, field_data
+    return fid_data, geometries, field_data, field_metadata
 
 
 @cython.boundscheck(False)  # Deactivate bounds checking
@@ -709,6 +718,10 @@ cdef get_features_by_fid(
         np.empty(shape=(count, ),
         dtype=fields[field_index,3]) for field_index in range(n_fields)
     ]
+    field_metadata = {
+        idx: np.empty(shape=(n_fields,), dtype='int32') 
+        for idx, ftype in zip(field_indexes, field_ogr_types) if ftype==OFTDateTime
+    }
 
     field_data_view = [field_data[field_index][:] for field_index in range(n_fields)]
 
@@ -728,11 +741,11 @@ cdef get_features_by_fid(
             process_geometry(ogr_feature, i, geom_view, force_2d)
 
         process_fields(
-            ogr_feature, i, n_fields, field_data, field_data_view,
+            ogr_feature, i, n_fields, field_data, field_data_view, field_metadata,
             field_indexes, field_ogr_types, encoding
         )
 
-    return (geometries, field_data)
+    return (geometries, field_data) # TODO field metadata
 
 
 @cython.boundscheck(False)  # Deactivate bounds checking
@@ -894,7 +907,7 @@ def ogr_read(
                 ogr_layer, skip_features, max_features
             )
 
-            fid_data, geometries, field_data = get_features(
+            fid_data, geometries, field_data, field_metadata = get_features(
                 ogr_layer,
                 fields,
                 encoding,
@@ -909,7 +922,8 @@ def ogr_read(
             'crs': crs,
             'encoding': encoding,
             'fields': fields[:,2], # return only names
-            'geometry_type': geometry_type
+            'geometry_type': geometry_type,
+            'field_metadata': dict(zip(fields[:,2], field_metadata.values()))
         }
 
     finally:

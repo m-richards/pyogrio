@@ -1,6 +1,6 @@
+import datetime
 from pyogrio.raw import DRIVERS_NO_MIXED_SINGLE_MULTI
 from pyogrio.raw import detect_driver, read, write
-import numpy as np
 
 
 def _stringify_path(path):
@@ -157,7 +157,9 @@ def read_dataframe(
         index = None
 
     df = pd.DataFrame(data, columns=columns, index=index)
-
+    for c in (cc for cc in df.columns if pd.api.types.is_datetime64_dtype(df[cc])):
+        tz = datetime.timezone(datetime.timedelta(minutes=meta['field_metadata'][c]))
+        df[c] = df[c].dt.tz_localize(tz)
     if geometry is None or not read_geometry:
         return df
 
