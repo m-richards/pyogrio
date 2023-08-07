@@ -343,12 +343,21 @@ def write_dataframe(
     # TODO: may need to fill in pd.NA, etc
     field_data = []
     field_mask = []
+    tz_offsets = {}  # dict[str,np.array(datetime.time)] special case for dt-tz fields
     for name in fields:
         ser = df[name]
-        col = ser.values
+        print("zzz", ser.dtype, isinstance(ser.dtype, pd.DatetimeTZDtype))
+        print(ser, name)
+
         if isinstance(ser.dtype, pd.DatetimeTZDtype):
-            # Deal with datetimes with timezones as strings
-            col = ser.astype(str)
+            # Deal with datetimes with timezones by passing down timezone separately
+            # pass down naive datetime
+            col = ser.dt.tz_localize(None).values
+            # pandas only supports a single offset per column
+            # access via array since we want a numpy array not a series
+            tz_offsets[name] = ser.array.timetz
+        else:
+            col = ser.values
 
         if isinstance(col, pd.api.extensions.ExtensionArray):
             from pandas.arrays import IntegerArray, FloatingArray, BooleanArray
@@ -429,6 +438,8 @@ def write_dataframe(
             crs = f"EPSG:{epsg}"
         else:
             crs = geometry.crs.to_wkt(WktVersion.WKT1_GDAL)
+    print("a")
+    print(field_data)
 
     write(
         path,
@@ -449,5 +460,6 @@ def write_dataframe(
         metadata=metadata,
         dataset_options=dataset_options,
         layer_options=layer_options,
+        tz_offsets=tz_offsets,
         **kwargs,
     )
