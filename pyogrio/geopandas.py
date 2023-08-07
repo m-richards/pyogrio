@@ -355,7 +355,10 @@ def write_dataframe(
             col = ser.dt.tz_localize(None).values
             # pandas only supports a single offset per column
             # access via array since we want a numpy array not a series
-            tz_offsets[name] = ser.array.timetz
+            # (only care about the utc offset, not actually the date)
+            # but ser.array.timetz won't have valid utc offset for pytz time zones
+            # (per https://docs.python.org/3/library/datetime.html#datetime.time.utcoffset) # noqa
+            tz_offsets[name] = ser.array.to_pydatetime()
         else:
             col = ser.values
 

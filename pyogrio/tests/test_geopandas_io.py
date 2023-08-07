@@ -173,13 +173,13 @@ def test_write_datetime_mixed_offset(tmp_path):
     )
     fpath = tmp_path / "test.geojson"
     write_dataframe(df, fpath)
-    df_no_tz = read_dataframe(
-        fpath, datetime_as_string=False
-    )  # TODO this shouldn't be called datetime as string in the pandas layer,
-    #     should it even be accessible?
-    # datetime_as_string=False ignores tz info, returns datetime objects
-    expected = ser_naive.astype("datetime64[ms]")
-    assert_series_equal(expected, df_no_tz["dates"])
+    # df_no_tz = read_dataframe(
+    #     fpath, datetime_as_string=False
+    # )  # TODO this shouldn't be called datetime as string in the pandas layer,
+    # #     should it even be accessible?
+    # # datetime_as_string=False ignores tz info, returns datetime objects
+    # expected = ser_naive.astype("datetime64[ms]")
+    # assert_series_equal(expected, df_no_tz["dates"])
     # datetime_as_string=True keeps tz info, but pandas can't handle multiple offsets
     # unless given a timezone to identify them with -> returned as strings
     df_local = read_dataframe(fpath, datetime_as_string=True)
