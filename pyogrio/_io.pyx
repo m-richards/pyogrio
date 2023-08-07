@@ -1529,8 +1529,6 @@ def ogr_write(
 
     if tz_offsets is None:
         tz_offsets = {}
-    print("offsets")
-    print(tz_offsets)
 
     if len(field_data) != len(fields):
         raise ValueError("field_data and fields must be same length")
@@ -1768,7 +1766,6 @@ def ogr_write(
             for field_idx in range(num_fields):
                 field_value = field_data[field_idx][i]
                 field_type = field_types[field_idx][0]
-                print("processing field type", field_type)
 
                 mask = field_mask[field_idx]
                 if mask is not None and mask[i]:
@@ -1835,7 +1832,6 @@ def ogr_write(
                             gdal_tz = 0
                         else:
                             gdal_tz = timezone_to_gdal_offset(tz_array[i])
-                        print(gdal_tz, 'timezone is', gdal_tz, type(gdal_tz))
                         OGR_F_SetFieldDateTimeEx(
                             ogr_feature,
                             field_idx,

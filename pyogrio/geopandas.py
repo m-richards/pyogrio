@@ -346,9 +346,6 @@ def write_dataframe(
     tz_offsets = {}  # dict[str,np.array(datetime.time)] special case for dt-tz fields
     for name in fields:
         ser = df[name]
-        print("zzz", ser.dtype, isinstance(ser.dtype, pd.DatetimeTZDtype))
-        print(ser, name)
-
         if isinstance(ser.dtype, pd.DatetimeTZDtype):
             # Deal with datetimes with timezones by passing down timezone separately
             # pass down naive datetime
@@ -441,8 +438,6 @@ def write_dataframe(
             crs = f"EPSG:{epsg}"
         else:
             crs = geometry.crs.to_wkt(WktVersion.WKT1_GDAL)
-    print("a")
-    print(field_data)
 
     write(
         path,
