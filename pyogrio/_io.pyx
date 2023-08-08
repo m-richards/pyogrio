@@ -1484,12 +1484,23 @@ cdef infer_field_types(list dtypes):
     return field_types
 
 
+FIFTEEN_MINUTE_DELTA = datetime.timedelta(minutes=15)
+
+cdef int timezone_to_gdal_offset(tz_as_datetime):
+    """Convert to GDAL timezone offset representation.
+    
+    https://gdal.org/development/rfc/rfc56_millisecond_precision.html#core-changes
+    """
+    return tz_as_datetime.utcoffset() / FIFTEEN_MINUTE_DELTA + 100
+
+
 # TODO: set geometry and field data as memory views?
 def ogr_write(
     str path, str layer, str driver, geometry, fields, field_data, field_mask,
     str crs, str geometry_type, str encoding, object dataset_kwargs,
     object layer_kwargs, bint promote_to_multi=False, bint nan_as_null=True,
-    bint append=False, dataset_metadata=None, layer_metadata=None
+    bint append=False, dataset_metadata=None, layer_metadata=None,
+    tz_offsets=None
 ):
     cdef const char *path_c = NULL
     cdef const char *layer_c = NULL
@@ -1515,6 +1526,9 @@ def ogr_write(
     cdef int i = 0
     cdef int num_records = len(geometry)
     cdef int num_fields = len(field_data) if field_data else 0
+
+    if tz_offsets is None:
+        tz_offsets = {}
 
     if len(field_data) != len(fields):
         raise ValueError("field_data and fields must be same length")
@@ -1813,6 +1827,11 @@ def ogr_write(
                         OGR_F_SetFieldNull(ogr_feature, field_idx)
                     else:
                         datetime = field_value.astype("datetime64[ms]").item()
+                        tz_array = tz_offsets.get(fields[field_idx], None)
+                        if tz_array is None:
+                            gdal_tz = 0
+                        else:
+                            gdal_tz = timezone_to_gdal_offset(tz_array[i])
                         OGR_F_SetFieldDateTimeEx(
                             ogr_feature,
                             field_idx,
@@ -1822,7 +1841,7 @@ def ogr_write(
                             datetime.hour,
                             datetime.minute,
                             datetime.second + datetime.microsecond / 10**6,
-                            0
+                            gdal_tz
                         )
 
                 else:
